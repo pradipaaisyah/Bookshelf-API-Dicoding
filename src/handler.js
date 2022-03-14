@@ -1,6 +1,6 @@
 const { nanoid } = require('nanoid');
 
-const bookShelfs = require('./books');
+const books = require('./books');
 
 const addBookHandler = (request, h) => {
   const { name, year, author, summary, publisher, pageCount, readPage, reading } = request.payload;
@@ -121,15 +121,21 @@ const getAllBooksHandler = (request, h) => {
   const response = h.response({
     status: 'success',
     data: {
-      book, 
-    }
-  })
+      books: books.map((book) => ({
+        id:book.id,
+        name: book.name,
+        publisher: book.publisher,
+      })),
+    },
+  });
+  response.code(200);
+  return response;
 };
 
 const getBookByIdHandler = (request, h) => {
-  const { id } = request.params;
+  const { bookId } = request.params;
 
-  const book = books.filter((book) => book.id === id)[0];
+  const book = books.filter((book) => book.id === bookId)[0];
 
   if (book !== undefined) {
     return {
@@ -150,7 +156,7 @@ const getBookByIdHandler = (request, h) => {
 };
 
   const editBookByIdHandler = (request, h) => {
-    const { id } = request.params;
+    const { bookId } = request.params;
 
     const { name, year, author, summary, publisher, pageCount, readPage, reading, } = request.payload;
     const insertedAt = new Date().toISOString();
@@ -174,7 +180,7 @@ const getBookByIdHandler = (request, h) => {
       return response;
     }
 
-    const index = books.findIndex((book) => book.id === id);
+    const index = books.findIndex((book) => book.id === bookId);
 
     if (index !== -1) {
       books[index] = {
@@ -207,9 +213,9 @@ const getBookByIdHandler = (request, h) => {
 };
 
 const deleteBookByIdHandler = (request, h) => {
-  const { id } = request.params;
+  const { bookId } = request.params;
 
-  const index = books.findIndex ((book) => book.id === id);
+  const index = books.findIndex ((book) => book.id === bookId);
 
   if (index !== -1) {
     books.splice(index, 1);
